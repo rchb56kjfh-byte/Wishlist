@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meine Wunschliste</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--tx:#1d1d1b;--mu:#6d6b64;--ac:#2f6f5e;--ac2:#e4efe9;--bd:#e3e1da;--bad:#b3402f;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161615;--card:#222220;--tx:#f1f0ea;--mu:#a09e95;--ac:#6fc2a9;--ac2:#24372f;--bd:#35342f;--bad:#ec8a78;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161615;--card:#222220;--tx:#f1f0ea;--mu:#a09e95;--ac:#6fc2a9;--ac2:#24372f;--bd:#35342f;--bad:#ec8a78;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:16px 16px 110px;max-width:640px;margin:0 auto;overflow-x:hidden}
+h1{font-size:22px;margin:4px 0 12px}
+.sum{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sum small{display:block;color:var(--mu);font-size:12px}
+.sum b{font-size:20px}
+.sum input{width:100%;font:inherit;font-weight:700;font-size:18px;background:transparent;color:var(--tx);border:0;border-bottom:1px solid var(--bd);padding:0 0 2px}
+.rest{grid-column:1/-1;border-radius:10px;padding:8px 10px;font-weight:600;background:var(--ac2);color:var(--ac)}
+.rest.neg{color:var(--bad)}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:14px 0 10px;scrollbar-width:none}
+.tabs button{flex:none;font:inherit;font-size:15px;padding:8px 14px;border-radius:999px;border:1px solid var(--bd);background:var(--card);color:var(--tx)}
+.tabs button.on{background:var(--ac);border-color:var(--ac);color:var(--bg);font-weight:600}
+.row{display:flex;justify-content:space-between;gap:10px;padding:12px 14px;background:var(--card);border:1px solid var(--bd);border-radius:12px;margin-bottom:8px}
+.row span{color:var(--mu);font-size:13px}
+.row.tot{background:var(--ac2);border-color:transparent;font-weight:700}
+.it{display:flex;gap:12px;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:10px;margin-bottom:10px}
+.it.done{opacity:.55}
+.it.done .tt{text-decoration:line-through}
+.th{flex:none;width:92px;height:92px;border-radius:10px;background:var(--ac2);display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden}
+.th img{width:100%;height:100%;object-fit:cover}
+.bd{min-width:0;flex:1}
+.tt{font-weight:600;overflow-wrap:anywhere}
+.pr{font-weight:700;color:var(--ac);margin:2px 0}
+.lk{display:block;color:var(--mu);font-size:13px;text-decoration:underline;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:14px}
+.ac button,.link{font:inherit;font-size:14px;background:none;border:0;color:var(--bad);padding:4px 0}
+.ac .ed{color:var(--ac);margin-right:14px}
+.chg{font-size:13px;font-weight:600}.chg.dn{color:var(--ac)}.chg.up{color:var(--bad)}.chk{font-size:12px;color:var(--mu)}
+.big{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;text-align:left;font:inherit;font-size:30px;padding:20px;border-radius:18px;border:1px solid var(--bd);background:var(--card);color:var(--tx);margin-bottom:12px}.big b{font-size:19px}.big span{font-size:14px;color:var(--mu)}.big *{pointer-events:none}
+.empty{color:var(--mu);text-align:center;padding:30px 10px}
+.fab{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));font:inherit;font-weight:700;padding:14px 20px;border-radius:999px;border:0;background:var(--ac);color:var(--bg);box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:5}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;z-index:20}
+.sheet.open{display:flex}
+.sheet form{background:var(--card);width:100%;max-width:640px;margin:0 auto;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));display:grid;gap:10px;max-height:92%;overflow-y:auto}
+.sheet h2{margin:0;font-size:18px}
+.sheet input[type=text],.sheet input[type=url]{width:100%;font:inherit;padding:11px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+.sheet label{font-size:13px;color:var(--mu);display:grid;gap:4px}
+.img{display:flex;align-items:center;gap:10px}
+.img .th{width:64px;height:64px;font-size:22px}
+.btns{display:flex;gap:10px}
+.btns button{flex:1;font:inherit;font-weight:700;padding:13px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+.btns .ok{background:var(--ac);border-color:var(--ac);color:var(--bg)}
+.note{position:fixed;top:0;right:0;height:100%;width:min(86vw,340px);background:var(--card);border-left:1px solid var(--bd);padding:calc(16px + env(safe-area-inset-top,0px)) 14px 16px;transform:translateX(100%);transition:transform .25s;z-index:10;display:flex;flex-direction:column;gap:8px}
+.note.open{transform:none}
+.note textarea{flex:1;font:inherit;resize:none;border:1px solid var(--bd);border-radius:10px;padding:10px;background:var(--bg);color:var(--tx)}
+.note h2{margin:0;font-size:17px}
+.tab{position:absolute;left:-46px;top:40%;width:46px;height:56px;border-radius:12px 0 0 12px;border:1px solid var(--bd);border-right:0;background:var(--card);font-size:22px;color:var(--tx)}
+</style>
+</head>
+<body>
+<h1>🛍️ Meine Wunschliste</h1>
+<div class="sum">
+  <div><small>Noch offen (alle Kategorien)</small><b id="total">0,00 €</b></div>
+  <div><small>Mein Budget (€)</small><input id="budget" type="text" inputmode="decimal" placeholder="z. B. 500"></div>
+  <div class="rest" id="rest"></div>
+</div>
+<div class="tabs" id="tabs"></div>
+<div id="view"></div>
+<button class="fab" id="fab" type="button">＋ Produkt</button>
+
+<div class="sheet" id="sheet">
+  <form id="form">
+    <h2 id="f-head">Neues Produkt</h2>
+    <label>Link<input type="url" id="f-url" placeholder="https://…" required></label>
+    <label>Titel<input type="text" id="f-title" placeholder="Name des Produkts"></label>
+    <label>Preis (€)<input type="text" id="f-price" inputmode="decimal" placeholder="z. B. 49,99"></label>
+    <div class="img">
+      <div class="th" id="f-prev">🛍️</div>
+      <label>Bild (Foto oder Screenshot)<input type="file" id="f-file" accept="image/*"></label>
+    </div>
+    <div class="btns"><button type="button" id="cancel">Abbrechen</button><button type="submit" class="ok">Fertig</button></div>
+  </form>
+</div>
+
+<aside class="note" id="note">
+  <button class="tab" id="noteBtn" type="button" aria-label="Notizen">📝</button>
+  <h2>Ideen und Notizen</h2>
+  <textarea id="noteTxt" placeholder="Was möchte ich mir noch kaufen?"></textarea>
+</aside>
+
+<script>
+const KEY='wunschliste-v1';
+let S=null;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!S.cats){S={cats:[{id:'c1',name:'Technik'},{id:'c2',name:'Klamotten'}],items:[],budget:'',notes:'',active:'all'}}
+S.friends=S.friends||[];S.active='home';
+const LAST=new Map();
+function sig(e){const{u,...r}=e;return JSON.stringify(r)}
+function initLast(){
+  LAST.clear();S.tomb=S.tomb||[];
+  ['cats','items','friends'].forEach(k=>(S[k]||[]).forEach(e=>{e.u=e.u||1;LAST.set(e.id,sig(e))}));
+  LAST.set('@b',S.budget);LAST.set('@n',S.notes);
+}
+function stamp(){
+  const now=Date.now(),seen=new Set();
+  ['cats','items','friends'].forEach(k=>(S[k]||[]).forEach(e=>{seen.add(e.id);const j=sig(e);if(LAST.get(e.id)!==j){e.u=now;LAST.set(e.id,j)}}));
+  [...LAST.keys()].forEach(id=>{if(id[0]!=='@'&&!seen.has(id)){S.tomb.push({id,u:now});LAST.delete(id)}});
+  if(LAST.get('@b')!==S.budget){S.bu=now;LAST.set('@b',S.budget)}
+  if(LAST.get('@n')!==S.notes){S.nu=now;LAST.set('@n',S.notes)}
+}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){alert('Speicher voll – bitte ein paar Produkte oder Bilder löschen.')}}
+function save(){stamp();persist();pushSoon()}
+initLast();
+const $=s=>document.querySelector(s);
+const eur=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(n||0);
+const num=v=>{const n=parseFloat(String(v||'').replace(/\./g,'').replace(',','.'));return isNaN(n)?0:n};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mine=i=>S.cats.some(c=>c.id===i.cat);const open=()=>S.items.filter(i=>!i.done&&mine(i));
+const sumOf=l=>l.reduce((a,i)=>a+num(i.price),0);
+function fixUrl(u){u=(u||'').trim();return /^https?:\/\//i.test(u)?u:'https://'+u}
+function host(u){try{return new URL(u).hostname.replace(/^www\./,'')}catch(e){return u}}
+function guess(u){try{const p=new URL(u).pathname.split('/').filter(x=>x&&!/^\d+$/.test(x)&&x.length>3).sort((a,b)=>b.length-a.length);let s=decodeURIComponent(p[0]||'').replace(/\.(html?|php)$/i,'').replace(/[-_+]+/g,' ').trim();return s?s[0].toUpperCase()+s.slice(1):''}catch(e){return ''}}
+
+function chg(i){
+  if(!i.ts)return '';
+  if(!i.ok)return '<div class="chk">Live-Preis nicht abrufbar</div>';
+  const d=num(i.price)-num(i.p0),t=new Date(i.ts).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  if(Math.abs(d)<.005)return '<div class="chk">Preis unverändert · geprüft '+t+'</div>';
+  return d<0?'<div class="chg dn">↓ '+eur(-d)+' günstiger (vorher '+eur(num(i.p0))+')</div><div class="chk">geprüft '+t+'</div>':'<div class="chg up">↑ '+eur(d)+' teurer (vorher '+eur(num(i.p0))+')</div><div class="chk">geprüft '+t+'</div>';
+}
+let busy=false;
+async function checkOne(i){
+  try{
+    const r=await fetch('/.netlify/functions/price?url='+encodeURIComponent(i.url));
+    const j=await r.json();i.ts=Date.now();
+    if(j.price>0){i.p0=i.p0||i.price;i.price=j.price.toFixed(2).replace('.',',');i.ok=1}else i.ok=0;
+  }catch(e){i.ts=Date.now();i.ok=0}
+}
+async function checkAll(force){
+  const l=S.items.filter(i=>!i.done&&i.url&&(force||!i.ts||Date.now()-i.ts>216e5));
+  if(!l.length||busy)return;
+  busy=true;render();
+  for(const i of l){await checkOne(i);save();render()}
+  busy=false;render();
+}
+function isF(){return S.friends.some(f=>f.id===S.active)}
+function renderHome(){
+  $('#tabs').innerHTML='';$('#fab').style.display='none';
+  const o=open();
+  $('#view').innerHTML='<button class="big" data-tab="all">🛍️<b>Meine Liste</b><span>'+o.length+' offen · '+eur(sumOf(o))+'</span></button><button class="big" data-tab="friends">🎁<b>Listen von Freunden</b><span>'+S.friends.length+' Listen</span></button>'+syncLink();
+}
+function renderFriends(){
+  $('#tabs').innerHTML='<button data-tab="home">← Start</button><button data-tab="newf">＋ Freund</button>';
+  $('#fab').style.display='none';
+  let o='';
+  S.friends.forEach(f=>{const l=S.items.filter(i=>i.cat===f.id&&!i.done);o+='<button class="big" data-tab="'+f.id+'">🎁<b>'+esc(f.name)+'</b><span>'+l.length+' offen · '+eur(sumOf(l))+'</span></button>'});
+  if(!S.friends.length)o='<div class="empty">Noch keine Liste. Tippe auf „＋ Freund“.</div>';
+  $('#view').innerHTML=o;
+}
+function render(){
+  const a=S.active,fr=isF();
+  document.querySelector('.sum').style.display=(a==='home'||a==='friends'||fr)?'none':'';
+  if(a==='home')return renderHome();
+  if(a==='friends')return renderFriends();
+  renderMain();
+  if(fr)$('#tabs').innerHTML='<button data-tab="friends">← Freunde</button>';
+}
+function renderMain(){
+  const t=sumOf(open());
+  $('#total').textContent=eur(t);
+  const b=num(S.budget),r=$('#rest');
+  if(S.budget===''){r.textContent='Gib dein Budget ein, um zu sehen, was du dir leisten kannst.';r.classList.remove('neg')}
+  else if(b>=t){r.textContent='Reicht: '+eur(b-t)+' bleiben übrig';r.classList.remove('neg')}
+  else{r.textContent='Es fehlen noch '+eur(t-b);r.classList.add('neg')}
+  let h='<button data-tab="home">← Start</button><button data-tab="all" class="'+(S.active==='all'?'on':'')+'">Übersicht</button>';
+  S.cats.forEach(c=>{h+='<button data-tab="'+c.id+'" class="'+(S.active===c.id?'on':'')+'">'+esc(c.name)+'</button>'});
+  h+='<button data-tab="new">＋ Kategorie</button>';
+  $('#tabs').innerHTML=h;
+  $('#fab').style.display=S.active==='all'?'none':'block';
+  const v=$('#view');
+  if(S.active==='all'){
+    let o='';
+    S.cats.forEach(c=>{const l=S.items.filter(i=>i.cat===c.id&&!i.done);o+='<div class="row"><div>'+esc(c.name)+'<br><span>'+l.length+' offen</span></div><b>'+eur(sumOf(l))+'</b></div>'});
+    o+='<div class="row tot"><div>Alle Kategorien zusammen</div><b>'+eur(t)+'</b></div>';
+    const d=S.items.filter(i=>i.done&&mine(i));
+    if(d.length)o+='<p class="empty">'+d.length+' bereits gekauft ('+eur(sumOf(d))+')</p>';
+    v.innerHTML=o;
+  }else{
+    const c=S.cats.find(x=>x.id===S.active)||S.friends.find(x=>x.id===S.active);
+    const l=S.items.filter(i=>i.cat===S.active);
+    let o='<div class="row tot"><div>Summe '+esc(c.name)+' (offen)</div><b>'+eur(sumOf(l.filter(i=>!i.done)))+'</b></div>';
+    if(!l.length)o+='<div class="empty">Noch nichts drin. Tippe auf „＋ Produkt“.</div>';
+    l.forEach(i=>{
+      o+='<div class="it'+(i.done?' done':'')+'"><div class="th">'+(i.img?'<img alt="" src="'+i.img+'">':'🛍️')+'</div><div class="bd"><div class="tt">'+esc(i.title||'Ohne Titel')+'</div><div class="pr">'+(i.price?eur(num(i.price)):'Kein Preis')+'</div>'+chg(i)+'<a class="lk" href="'+esc(i.url)+'" target="_blank" rel="noopener noreferrer">'+esc(host(i.url))+' ↗ Zum Produkt</a><div class="ac"><label><input type="checkbox" data-done="'+i.id+'"'+(i.done?' checked':'')+'> Gekauft</label><span><button class="ed" data-edit="'+i.id+'">Bearbeiten</button><button data-del="'+i.id+'">Löschen</button></span></div></div></div>';
+    });
+    o+='<p style="text-align:center"><button class="link" style="color:var(--ac)" data-chk="1">'+(busy?'Prüfe Preise …':'↻ Preise jetzt prüfen')+'</button><br><button class="link" data-delcat="1">'+(isF()?'Liste von':'Kategorie')+' „'+esc(c.name)+'“ löschen</button></p>';
+    v.innerHTML=o;
+  }
+}
+
+$('#tabs').addEventListener('click',e=>{
+  const id=e.target.dataset.tab;if(!id)return;
+  if(id==='new'){const n=(prompt('Name der neuen Kategorie:')||'').trim();if(!n)return;const c={id:'c'+Date.now(),name:n};S.cats.push(c);S.active=c.id}
+  else if(id==='newf'){const n=(prompt('Name des Freundes:')||'').trim();if(!n)return;const f={id:'f'+Date.now(),name:n};S.friends.push(f);S.active=f.id}
+  else S.active=id;
+  if(S.cats.some(c=>c.id===S.active))S.lastCat=S.active;
+  save();render();
+});
+$('#view').addEventListener('click',e=>{
+  const d=e.target.dataset;
+  if(d.sync)setup();
+  if(d.tab){S.active=d.tab;save();render()}
+  if(d.edit)openEdit(d.edit);
+  if(d.chk&&!busy)checkAll(true);
+  if(d.del&&confirm('Produkt löschen?')){S.items=S.items.filter(i=>i.id!==d.del);save();render()}
+  if(d.delcat&&confirm('Kategorie samt allen Produkten löschen?')){S.items=S.items.filter(i=>i.cat!==S.active);const wasF=isF();S.cats=S.cats.filter(c=>c.id!==S.active);S.friends=S.friends.filter(f=>f.id!==S.active);S.active=wasF?'friends':'all';save();render()}
+});
+$('#view').addEventListener('change',e=>{
+  const id=e.target.dataset.done;if(!id)return;
+  const i=S.items.find(x=>x.id===id);if(i){i.done=e.target.checked;save();render()}
+});
+$('#budget').value=S.budget;
+$('#budget').addEventListener('input',e=>{S.budget=e.target.value;save();render()});
+
+let img='';
+const sheet=$('#sheet');
+let editId=null;
+function openSheet(i){
+  $('#form').reset();editId=i?i.id:null;img=i?i.img:'';
+  $('#f-head').textContent=i?'Produkt bearbeiten':'Neues Produkt';
+  $('#f-prev').innerHTML=img?'<img alt="" src="'+img+'">':'🛍️';
+  if(i){$('#f-url').value=i.url;$('#f-title').value=i.title;$('#f-price').value=i.price;$('#f-title').dataset.touched='1'}
+  else $('#f-title').dataset.touched='';
+  sheet.classList.add('open');
+}
+function openEdit(id){const i=S.items.find(x=>x.id===id);if(i)openSheet(i)}
+$('#fab').onclick=()=>openSheet(null);
+$('#cancel').onclick=()=>sheet.classList.remove('open');
+sheet.addEventListener('click',e=>{if(e.target===sheet)sheet.classList.remove('open')});
+$('#f-url').addEventListener('input',e=>{const t=$('#f-title');if(!t.dataset.touched||!t.value)t.value=guess(e.target.value)});
+$('#f-title').addEventListener('input',e=>{e.target.dataset.touched='1'});
+$('#f-file').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{const im=new Image();im.onload=()=>{
+    const k=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement('canvas');
+    c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+    c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+    img=c.toDataURL('image/jpeg',.72);
+    $('#f-prev').innerHTML='<img alt="" src="'+img+'">';
+  };im.src=r.result};
+  r.readAsDataURL(f);
+});
+$('#form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const data={url:fixUrl($('#f-url').value),title:$('#f-title').value.trim(),price:$('#f-price').value.trim(),img:img};
+  const it=editId&&S.items.find(x=>x.id===editId);
+  data.p0=(it&&it.price===data.price&&it.p0)||data.price;
+  if(it)Object.assign(it,data);else S.items.unshift(Object.assign({id:'i'+Date.now(),cat:S.active,done:false},data));
+  $('#f-title').dataset.touched='';
+  save();sheet.classList.remove('open');render();
+});
+
+const note=$('#note');
+$('#noteTxt').value=S.notes||'';
+$('#noteTxt').addEventListener('input',e=>{S.notes=e.target.value;save()});
+$('#noteBtn').onclick=()=>note.classList.toggle('open');
+const PWK='wl-sync-pw',FSK='wl-synced';
+let pt=null,syncing=false,syncMsg='',rev=0;
+function pw(){try{return localStorage.getItem(PWK)||''}catch(e){return ''}}
+function setMsg(t){syncMsg=t;const e=$('#syncMsg');if(e)e.textContent=t}
+function syncLink(){return '<p style="text-align:center"><button class="link" style="color:var(--mu)" data-sync="1">☁️ <span style="pointer-events:none" id="syncMsg">'+esc(syncMsg||(pw()?'Sync an':'Sync einrichten'))+'</span></button></p>'}
+function payload(){return{cats:S.cats,items:S.items,friends:S.friends,tomb:S.tomb,budget:S.budget,bu:S.bu||0,notes:S.notes,nu:S.nu||0}}
+function adopt(m){
+  ['cats','items','friends','tomb'].forEach(k=>{S[k]=m[k]||[]});
+  S.budget=m.budget||'';S.bu=m.bu||0;S.notes=m.notes||'';S.nu=m.nu||0;
+  if(!['home','friends','all'].includes(S.active)&&!S.cats.some(c=>c.id===S.active)&&!isF())S.active='all';
+  initLast();persist();
+  if(document.activeElement!==$('#budget'))$('#budget').value=S.budget;
+  if(document.activeElement!==$('#noteTxt'))$('#noteTxt').value=S.notes;
+  if(!$('#sheet').classList.contains('open'))render();
+}
+async function api(method,body){
+  const r=await fetch('/.netlify/functions/sync',{method,headers:{'x-sync-key':pw(),'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.error||('Fehler '+r.status));
+  return j.state;
+}
+async function sync(replace){
+  if(!pw()||syncing)return;
+  syncing=true;setMsg('Synchronisiere …');
+  const r0=rev;
+  try{
+    let m=replace?await api('GET'):null;
+    if(!m)m=await api('PUT',{state:payload()});
+    if(rev!==r0)pushSoon();else adopt(m);
+    try{localStorage.setItem(FSK,'1')}catch(e){}
+    setMsg('Synchronisiert · '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}));
+  }catch(e){
+    setMsg('Sync fehlgeschlagen: '+e.message);
+    if(/Passwort/.test(e.message)){try{localStorage.removeItem(PWK)}catch(x){}}
+  }
+  syncing=false;
+}
+function pushSoon(){rev++;clearTimeout(pt);pt=setTimeout(()=>sync(false),1500)}
+function setup(){
+  const p=prompt('Sync-Passwort (dasselbe wie SYNC_PASSWORD bei Netlify):',pw());
+  if(!p||!p.trim())return;
+  try{localStorage.setItem(PWK,p.trim())}catch(e){}
+  const first=!localStorage.getItem(FSK);
+  const own=first&&confirm('Soll der Stand von DIESEM Gerät der Ausgangspunkt sein?\n\nOK = ja (z. B. die Web-App vom Home-Bildschirm)\nAbbrechen = Stand vom Server übernehmen');
+  sync(first&&!own);
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync(false)});
+setInterval(()=>{if(!document.hidden)sync(false)},60000);
+render();
+checkAll(false);
+sync(false);
+const q=new URLSearchParams(location.search),su=q.get('url')||q.get('link')||q.get('add')||q.get('u');
+if(su&&S.cats.length){
+  S.active=S.cats.some(c=>c.id===S.lastCat)?S.lastCat:S.cats[0].id;
+  render();openSheet(null);
+  $('#f-url').value=su;$('#f-title').value=q.get('title')||guess(fixUrl(su));
+  history.replaceState(null,'',location.pathname);
+}
+</script>
+</body>
+</html>
